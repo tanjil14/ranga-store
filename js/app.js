@@ -125,7 +125,7 @@ const loadProducts = () => {
     },
     {
       id: 14,
-      title: "Samsung 49-Inch CHG90 144Hz Curved Gaming Monitor (LC49HG90DMNXZA) – Super Ultrawide Screen QLED ",
+      title: "Samsung 49-Inch CHG90 144Hz Curved Gaming Monitor – Super Ultrawide Screen QLED ",
       price: 999.99,
       description:
         "49 INCH SUPER ULTRAWIDE 32:9 CURVED GAMING MONITOR with dual 27 inch screen side by side QUANTUM DOT (QLED) TECHNOLOGY, HDR support and factory calibration provides stunningly realistic and accurate color and contrast 144HZ HIGH REFRESH RATE and 1ms ultra fast response time work to eliminate motion blur, ghosting, and reduce input lag",
@@ -199,27 +199,41 @@ const loadProducts = () => {
 const showProducts = (products) => {
   const allProducts = products.map((pd) => pd);
   for (const product of allProducts) {
+    // get star with percentage
+    const star = getStarRatingPercent(product.rating);
     const image = product.image;
     const div = document.createElement("div");
     div.classList.add("product");
-    div.innerHTML = `<div class="single-product">
-      <div>
-    <img class="product-image" src=${image}></img>
+    div.innerHTML = `<div class="well single-product">
+    <div class="image">
+      <img class="product-image" src="${image}" />
+    </div>
+    <div class="product-body">
+      <h3 class="product-title">${product.title}</h3>
+      <p class="product-categories">Category: ${product.category}</p>
+      <div class="star-box">
+        <div class="stars-outer">
+          <div class="stars-inner" style="width: ${star};"></div>
+        </div>
+        <p>${product.rating.rate}</p>
       </div>
-      <h3>${product.title}</h3>
-      <p>Category: ${product.category}</p>
-      <h2>Price: $ ${product.price}</h2>
-      <button onclick="addToCart(${product.id},${product.price})" id="addToCart-btn" class="buy-now btn btn-success">add to cart</button>
-      <button id="details-btn" class="btn btn-danger">Details</button></div>
+      <div class="review-count">
+        <span><i class="fas fa-user-edit"></i></span>
+        <p class="count">${product.rating.count}</p>
+      </div>
+      <h4 class="product-price">Price: $ ${product.price}</h4>
+    </div>
+    <button onclick="addToCart(${product.id},${product.price})" id="addToCart-btn" class="buy-now btn-block">Add to cart</button>
+  </div>
       `;
     document.getElementById("all-products").appendChild(div);
   }
 };
+//generate cart
 let count = 0;
 const addToCart = (id, price) => {
   count = count + 1;
   updatePrice("price", price);
-
   updateTaxAndCharge();
   updateTotal();
   document.getElementById("total-Products").innerText = count;
@@ -236,7 +250,8 @@ const updatePrice = (id, value) => {
   const convertedOldPrice = getInputValue(id);
   const convertPrice = parseFloat(value);
   const total = convertedOldPrice + convertPrice;
-  document.getElementById(id).innerText = total.toFixed(2);
+  const roundTotal = total.toFixed(2);
+  document.getElementById(id).innerText = roundTotal;
 };
 
 // set innerText function
@@ -264,7 +279,17 @@ const updateTaxAndCharge = () => {
 //grandTotal update function
 const updateTotal = () => {
   const grandTotal = getInputValue("price") + getInputValue("delivery-charge") + getInputValue("total-tax");
-  document.getElementById("total").innerText = grandTotal;
+  document.getElementById("total").innerText = grandTotal.toFixed(2);
 };
 
+//percent of star rating
+function getStarRatingPercent(data) {
+  const rating = data.rate;
+  const totalStars = 5;
+  //get percentage
+  const starPercentage = (rating / totalStars) * 100;
+  // round to nearest 10
+  const starPercentageRounded = `${Math.round(starPercentage / 10) * 10}%`;
+  return starPercentageRounded;
+}
 loadProducts();
